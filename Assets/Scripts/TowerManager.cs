@@ -4,6 +4,11 @@ using System.Collections.Generic;
 
 public class TowerManager : MonoBehaviour
 {
+	public TowerState towerState 
+	{
+		get; private set;
+	}
+
 	/// <summary>
 	///  Singleton stuff
 	/// </summary>
@@ -20,7 +25,6 @@ public class TowerManager : MonoBehaviour
 	/// 
 
 	private string labelStr = "Nothing to show.";
-	bool isStationary = true;
 
 	public Collider groundTrigger;
 	public Collider heightTrigger;
@@ -59,14 +63,22 @@ public class TowerManager : MonoBehaviour
 		singleton = this;
 
 		stackedBoxes = new List<GameObject>();
-
-
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		isStationary = stackedBoxesAreStationary();
+		var isStationary = stackedBoxesAreStationary();
+
+		if (isStationary)
+		{
+			towerState = TowerState.STATIONARY;
+		}
+
+		else
+		{
+			towerState = TowerState.MOVING;
+		}
 	}
 
 	public void onObjectTriggeredGround(Collider objCollider)
@@ -92,7 +104,7 @@ public class TowerManager : MonoBehaviour
 	void OnGUI()
 	{
 		GUILayout.Label(labelStr);
-		GUILayout.Label(isStationary ? "Stationary" : "Moving");
+		GUILayout.Label(towerState.ToString());
 	}
 
 	void log(string str)
