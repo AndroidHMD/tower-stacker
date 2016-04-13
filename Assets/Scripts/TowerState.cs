@@ -3,5 +3,5 @@ using System.Collections;
 
 public enum TowerState 
 {
-	STATIONARY, MOVING
+	STATIONARY, MOVING, INCREASING_HEIGHT
 }

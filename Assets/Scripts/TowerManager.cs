@@ -32,11 +32,17 @@ public class TowerManager : MonoBehaviour
 	public float stationaryLinearVelocityBound = 0.1f;
 	public float stationaryAngularVelocityBound = 0.1f;
 
+	public GameObject platformParent;
+
+	public float heightIncrement = 4.0f;
+	public float heightAnimationTime = 2.0f;
+
 	private List<GameObject> stackedBoxes;
 
 	public void addStackedBox(GameObject box)
 	{
 		stackedBoxes.Add(box);
+		heightTrigger.enabled = false;
 	}
 
 
@@ -64,20 +70,62 @@ public class TowerManager : MonoBehaviour
 
 		stackedBoxes = new List<GameObject>();
 	}
-	
-	// Update is called once per frame
-	void Update ()
+
+	void updateTowerState()
 	{
 		var isStationary = stackedBoxesAreStationary();
 
 		if (isStationary)
 		{
-			towerState = TowerState.STATIONARY;
+			setStationary();
 		}
 
 		else
 		{
 			towerState = TowerState.MOVING;
+		}
+	}
+
+	void setStationary()
+	{
+		towerState = TowerState.STATIONARY;
+		heightTrigger.enabled = true;
+	}
+
+	void startUpdateTowerHeight()
+	{
+		Vector3 newPlatformPosition = platformParent.transform.position + new Vector3(0.0f, heightIncrement, 0.0f);
+
+		iTween.MoveTo(platformParent, newPlatformPosition, heightAnimationTime);
+		Invoke("setStationary", heightAnimationTime);
+	}
+
+	void updatePlatformHeight()
+	{
+		foreach(var stackedBox in stackedBoxes)
+		{
+			var boxCollider = stackedBox.GetComponent<BoxCollider>();
+
+			if (heightTrigger.bounds.Intersects(boxCollider.bounds))
+			{
+				log("Tower reached specific height, increasing height!");
+				towerState = TowerState.INCREASING_HEIGHT;
+
+				startUpdateTowerHeight();
+
+				return;
+			}
+		}
+	}
+	
+	// Update is called once per frame
+	void Update ()
+	{
+		updateTowerState();
+
+		if (!towerState.Equals(TowerState.MOVING))
+		{
+			updatePlatformHeight();
 		}
 	}
 

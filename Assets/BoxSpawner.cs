@@ -65,5 +65,10 @@ public class BoxSpawner : MonoBehaviour {
 		{
 			Debug.Log("Tower is moving => NOT spawning box.");
 		}
+
+		else if (state.Equals(TowerState.INCREASING_HEIGHT))
+		{
+			Debug.Log("Tower is updating height => NOT spawning box.");
+		}
 	}
 }
