@@ -9,7 +9,7 @@ public class BoxSpawner : MonoBehaviour {
 	
 	}
 
-	void FixedUpdate () {
+	void Update () {
 		Ray ray = Camera.main.ScreenPointToRay(
 			new Vector3(Screen.currentResolution.width / 2, 
 						Screen.currentResolution.height / 2, 
@@ -48,14 +48,19 @@ public class BoxSpawner : MonoBehaviour {
 		{
 			Debug.Log("Tower is stationary => spawning box.");
 			var spawnedBox = Instantiate(box.gameObject) as GameObject;
+			spawnedBox.transform.position = box.transform.position;
+			spawnedBox.transform.rotation = box.transform.rotation;
 
 			spawnedBox.GetComponent<BoxCollider>().enabled = true;
 
 			// Disable XZ-rotation lock
-			spawnedBox.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+			var rb = spawnedBox.GetComponent<Rigidbody>();
+			rb.constraints = RigidbodyConstraints.None;
+			rb.velocity = Vector3.zero;
+			rb.angularVelocity = Vector3.zero;
 
 			// Ignore collisions with spawn plane
-			Physics.IgnoreCollision(spawnPlane, spawnedBox.GetComponent<Collider>());
+			Physics.IgnoreCollision(spawnPlane, spawnedBox.GetComponent<BoxCollider>());
 
 			// Add it to the tower stack
 			TowerManager.GetInstance().addStackedBox(spawnedBox);	

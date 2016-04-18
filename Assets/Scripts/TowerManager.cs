@@ -27,7 +27,6 @@ public class TowerManager : MonoBehaviour
 	private string labelStr = "Nothing to show.";
 
 	public Collider groundTrigger;
-	public Collider heightTrigger;
 
 	public float stationaryLinearVelocityBound = 0.1f;
 	public float stationaryAngularVelocityBound = 0.1f;
@@ -42,7 +41,6 @@ public class TowerManager : MonoBehaviour
 	public void addStackedBox(GameObject box)
 	{
 		stackedBoxes.Add(box);
-		heightTrigger.enabled = false;
 	}
 
 
@@ -89,7 +87,6 @@ public class TowerManager : MonoBehaviour
 	void setStationary()
 	{
 		towerState = TowerState.STATIONARY;
-		heightTrigger.enabled = true;
 	}
 
 	void startUpdateTowerHeight()
@@ -99,34 +96,17 @@ public class TowerManager : MonoBehaviour
 		iTween.MoveTo(platformParent, newPlatformPosition, heightAnimationTime);
 		Invoke("setStationary", heightAnimationTime);
 	}
-
-	void updatePlatformHeight()
-	{
-		foreach(var stackedBox in stackedBoxes)
-		{
-			var boxCollider = stackedBox.GetComponent<BoxCollider>();
-
-			if (heightTrigger.bounds.Intersects(boxCollider.bounds))
-			{
-				log("Tower reached specific height, increasing height!");
-				towerState = TowerState.INCREASING_HEIGHT;
-
-				startUpdateTowerHeight();
-
-				return;
-			}
-		}
-	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
 		updateTowerState();
+	}
 
-		if (!towerState.Equals(TowerState.MOVING))
-		{
-			updatePlatformHeight();
-		}
+	public void onTowerIsTooHigh()
+	{
+		log("Tower is too high!");
+		startUpdateTowerHeight();
 	}
 
 	public void onObjectTriggeredGround(Collider objCollider)
