@@ -4,13 +4,17 @@ using System.Collections;
 public class BoxSpawner : MonoBehaviour {
 	public Transform box;
 	public Collider spawnPlane;
+	private Camera camera;
 
 	void Start () {
-	
+		foreach (var cam in Camera.allCameras)
+		{
+			camera = cam;
+		}
 	}
 
 	void Update () {
-		Ray ray = Camera.main.ScreenPointToRay(
+		Ray ray = camera.ScreenPointToRay(
 			new Vector3(Screen.currentResolution.width / 2, 
 						Screen.currentResolution.height / 2, 
 						0.0f)
